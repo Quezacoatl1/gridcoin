@@ -3063,25 +3063,6 @@ int64_t ReturnCurrentMoneySupply(CBlockIndex* pindexcurrent)
 
 bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck, bool fReorganizing)
 {
-  /* ignore on bad blocks already in chain */
-
-    const std::set<uint256> vSkipHashSignCheck =
-    {    uint256("129ae6779d620ec189f8e5148e205efca2dfe31d9f88004b918da3342157b7ff") //T407024
-        ,uint256("c3f85818ba5290aaea1bcbd25b4e136f83acc93999942942bbb25aee2c655f7a") //T407068
-        ,uint256("cf7f1316f92547f611852cf738fc7a4a643a2bb5b9290a33cd2f9425f44cc3f9") //T407099
-        ,uint256("b47085beb075672c6f20d059633d0cad4dba9c5c20f1853d35455b75dc5d54a9") //T407117
-        ,uint256("5a7d437d15bccc41ee8e39143e77960781f3dcf08697a888fa8c4af8a4965682") //T407161
-        ,uint256("aeb3c24277ae1047bda548975a515e9d353d6e12a2952fb733da03f92438fb0f") //T407181
-        ,uint256("fc584b18239f3e3ea78afbbd33af7c6a29bb518b8299f01c1ed4b52d19413d4f") //T407214
-        ,uint256("58b2d6d0ff7e3ebcaca1058be7574a87efadd4b7f5c661f9e14255f851a6185e") //P1144550 S
-        ,uint256("471292b59e5f3ad94c39b3784a9a3f7a8324b9b56ff0ad00bd48c31658537c30") //P1146939 S
-        ,uint256("5b63d4edbdec06ddc2182703ce45a3ced70db0d813e329070e83bf37347a6c2c") //P1152917 S
-        ,uint256("e9035d821668a0563b632e9c84bc5af73f53eafcca1e053ac6da53907c7f6940") //P1154121 S
-        ,uint256("1d30c6d4dce377d69c037f1a725aabbc6bafa72a95456dbe2b2538bc1da115bd") //P1168122 S
-        ,uint256("934c6291209d90bb5d3987885b413c18e39f0e28430e8d302f20888d2a35e725") //P1168193 S
-        ,uint256("58282559939ced7ebed7d390559c7ac821932958f8f2399ad40d1188eb0a57f9") //P1170167 S
-        ,uint256("946996f693a33fa1334c1f068574238a463d438b1a3d2cd6d1dd51404a99c73d") //P1176436 S
-    };
     // Check it again in case a previous version let a bad block in, but skip BlockSig checking
     if (!CheckBlock("ConnectBlock",pindex->pprev->nHeight, 395*COIN, !fJustCheck, !fJustCheck, false,false))
     {
@@ -3363,7 +3344,18 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck, boo
                             call the function. The height is of previous block. */
                         if( !IsCPIDValidv2(bb,pindex->nHeight-1) )
                         {
-                            if( vSkipHashSignCheck.count(pindex->GetBlockHash())==0 )
+                            /* ignore on bad blocks already in chain */
+                            const std::set<uint256> vSkipHashBoincSignCheck =
+                            {    uint256("58b2d6d0ff7e3ebcaca1058be7574a87efadd4b7f5c661f9e14255f851a6185e") //P1144550 S
+                                ,uint256("471292b59e5f3ad94c39b3784a9a3f7a8324b9b56ff0ad00bd48c31658537c30") //P1146939 S
+                                ,uint256("5b63d4edbdec06ddc2182703ce45a3ced70db0d813e329070e83bf37347a6c2c") //P1152917 S
+                                ,uint256("e9035d821668a0563b632e9c84bc5af73f53eafcca1e053ac6da53907c7f6940") //P1154121 S
+                                ,uint256("1d30c6d4dce377d69c037f1a725aabbc6bafa72a95456dbe2b2538bc1da115bd") //P1168122 S
+                                ,uint256("934c6291209d90bb5d3987885b413c18e39f0e28430e8d302f20888d2a35e725") //P1168193 S
+                                ,uint256("58282559939ced7ebed7d390559c7ac821932958f8f2399ad40d1188eb0a57f9") //P1170167 S
+                                ,uint256("946996f693a33fa1334c1f068574238a463d438b1a3d2cd6d1dd51404a99c73d") //P1176436 S
+                            };
+                            if( vSkipHashBoincSignCheck.count(pindex->GetBlockHash())==0 )
                                 return DoS(20, error(
                                     "ConnectBlock[ResearchAge]: Bad CPID or Block Signature : CPID %s, cpidv2 %s, LBH %s, Bad Hashboinc [%s]",
                                      bb.cpid.c_str(), bb.cpidv2.c_str(),
@@ -3380,19 +3372,27 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck, boo
                             if (fTestNet || (pindex->nHeight > 975000)) return DoS(20, error(" %s ",sNarr.c_str()));
                         }
 
-                        if( vSkipHashSignCheck.count(pindex->GetBlockHash())==0 )
+                        const std::set<uint256> vSkipHashdStakeRewardSignCheck =
+                        {   uint256("129ae6779d620ec189f8e5148e205efca2dfe31d9f88004b918da3342157b7ff") //T407024
+                           ,uint256("c3f85818ba5290aaea1bcbd25b4e136f83acc93999942942bbb25aee2c655f7a") //T407068
+                           ,uint256("cf7f1316f92547f611852cf738fc7a4a643a2bb5b9290a33cd2f9425f44cc3f9") //T407099
+                           ,uint256("b47085beb075672c6f20d059633d0cad4dba9c5c20f1853d35455b75dc5d54a9") //T407117
+                           ,uint256("5a7d437d15bccc41ee8e39143e77960781f3dcf08697a888fa8c4af8a4965682") //T407161
+                           ,uint256("aeb3c24277ae1047bda548975a515e9d353d6e12a2952fb733da03f92438fb0f") //T407181
+                           ,uint256("fc584b18239f3e3ea78afbbd33af7c6a29bb518b8299f01c1ed4b52d19413d4f") //T407214
+                        };
+                        if( vSkipHashdStakeRewardSignCheck.count(pindex->GetBlockHash())==0 )
                         {
-                          if (dStakeReward > ((OUT_POR*1.25)+OUT_INTEREST+1+CoinToDouble(nFees)))
-                          {
-                             StructCPID st1 = GetLifetimeCPID(pindex->GetCPID(),"ConnectBlock()");
-                              GetProofOfStakeReward(nCoinAge, nFees, bb.cpid, true, 2, nTime,
-                                          pindex, "connectblock_researcher_doublecheck", OUT_POR, OUT_INTEREST, dAccrualAge, dMagnitudeUnit, dAvgMagnitude);
+                            if (dStakeReward > ((OUT_POR*1.25)+OUT_INTEREST+1+CoinToDouble(nFees)))
+                            {
+                              StructCPID st1 = GetLifetimeCPID(pindex->GetCPID(),"ConnectBlock()");
+                              GetProofOfStakeReward(nCoinAge, nFees, bb.cpid, true, 2, nTime, pindex, "connectblock_researcher_doublecheck", OUT_POR, OUT_INTEREST, dAccrualAge, dMagnitudeUnit, dAvgMagnitude);
                               if (dStakeReward > ((OUT_POR*1.25)+OUT_INTEREST+1+CoinToDouble(nFees)))
                               {
-                                  if (fDebug3) LogPrintf("ConnectBlockError[ResearchAge] : Researchers Reward Pays too much : Interest %f and Research %f and StakeReward %f, OUT_POR %f, with Out_Interest %f for CPID %s ",
-                                      (double)bb.InterestSubsidy,(double)bb.ResearchSubsidy,dStakeReward,(double)OUT_POR,(double)OUT_INTEREST,bb.cpid);
-                                  return DoS(10,error("ConnectBlock[ResearchAge] : Researchers Reward Pays too much : Interest %f and Research %f and StakeReward %f, OUT_POR %f, with Out_Interest %f for CPID %s ",
-                                      (double)bb.InterestSubsidy,(double)bb.ResearchSubsidy,dStakeReward,(double)OUT_POR,(double)OUT_INTEREST,bb.cpid.c_str()));
+                                    if (fDebug3) LogPrintf("ConnectBlockError[ResearchAge] : Researchers Reward Pays too much : Interest %f and Research %f and StakeReward %f, OUT_POR %f, with Out_Interest %f for CPID %s ",
+                                        (double)bb.InterestSubsidy,(double)bb.ResearchSubsidy,dStakeReward,(double)OUT_POR,(double)OUT_INTEREST,bb.cpid);
+                                        return DoS(10,error("ConnectBlock[ResearchAge] : Researchers Reward Pays too much : Interest %f and Research %f and StakeReward %f, OUT_POR %f, with Out_Interest %f for CPID %s ",
+                                            (double)bb.InterestSubsidy,(double)bb.ResearchSubsidy,dStakeReward,(double)OUT_POR,(double)OUT_INTEREST,bb.cpid.c_str()));
                               }
                         }
                       }
